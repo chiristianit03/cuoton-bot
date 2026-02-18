@@ -57,6 +57,9 @@ def fetch_odds(sport_key: str) -> list:
     r = requests.get(url, params=params, timeout=25)
     r.raise_for_status()
     return r.json()
+    print(sk, "events:", len(data))
+    if data:
+    print("example bookmakers:", len(data[0].get("bookmakers", [])))
 
 def extract_candidates(data: list, sport_key: str) -> List[Pick]:
     picks: List[Pick] = []
