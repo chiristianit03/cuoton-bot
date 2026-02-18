@@ -15,9 +15,10 @@ SPORT_KEYS = [
     "soccer_france_ligue_one",
 ]
 
-REGION = "uk"              # en soccer suele venir mejor que eu
-MARKETS = "h2h,spreads,totals"            # lo seguro en v4 para fútbol
-ODDS_PER_LEG_RANGE = (2.0, 12.0)   # baja el mínimo para que encuentre picks
+REGION = "uk,eu,us"
+MARKETS = "h2h"
+ODDS_PER_LEG_RANGE = (1.2, 30.0)
+
 
 
 TARGET_ODDS = 900.0
@@ -56,12 +57,25 @@ def fetch_odds(sport_key: str) -> list:
     }
     r = requests.get(url, params=params, timeout=25)
 
+    # headers útiles si hay límites/créditos
+    remaining = r.headers.get("x-requests-remaining")
+    used = r.headers.get("x-requests-used")
+
     if r.status_code != 200:
-        # te manda el error exacto a Telegram (una vez lo veas, lo solucionamos al toque)
-        tg_send(f"ERROR API {sport_key}: HTTP {r.status_code}\n{r.text[:350]}")
+        tg_send(
+            f"❌ ERROR API en {sport_key}\n"
+            f"HTTP {r.status_code}\n"
+            f"used={used} remaining={remaining}\n"
+            f"{r.text[:350]}"
+        )
         return []
 
-    return r.json()
+    data = r.json()
+    # diagnóstico rápido para saber si vienen eventos/bookmakers
+    bm0 = len(data[0].get("bookmakers", [])) if data else 0
+    tg_send(f"✅ {sport_key}: events={len(data)} first_event_bookmakers={bm0} used={used} remaining={remaining}")
+    return data
+
 
 
 def extract_candidates(data: list, sport_key: str) -> List[Pick]:
@@ -99,8 +113,8 @@ def extract_candidates(data: list, sport_key: str) -> List[Pick]:
             p_med = median(probs)
 
             # Filtro básico: evita locuras con prob demasiado baja
-            if p_med < 0.08:  # ~12.5x o más; ajusta luego
-                continue
+            # if p_med < 0.08:  # ~12.5x o más; ajusta luego
+            #    continue
 
             point_txt = f" {point}" if point is not None else ""
             label = f"{home} vs {away} | {mk}: {name}{point_txt} @ {max_odds:.2f} | p~{p_med*100:.1f}%"
@@ -148,9 +162,9 @@ def build_acca(picks: List[Pick], target: float, legs_range: Tuple[int,int], tol
 def main():
     all_picks: List[Pick] = []
     for sk in SPORT_KEYS:
-        try:
-            data = fetch_odds(sk)
-            all_picks.extend(extract_candidates(data, sk))
+        data = fetch_odds(sk)  # fetch_odds ya avisará error si ocurre
+        all_picks.extend(extract_candidates(data, sk))
+
         
     if not all_picks:
         tg_send("No encontré candidatos hoy (o la API no devolvió datos).")
