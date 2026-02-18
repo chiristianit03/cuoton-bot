@@ -1,9 +1,8 @@
-name: cuoton-bot
+name: batibot-v4
 
 on:
   schedule:
-    - cron: "0 */12 * * *"
-
+    - cron: "0 */12 * * *"   # cada 12 horas (free tier friendly)
   workflow_dispatch:
 
 jobs:
@@ -26,4 +25,12 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           GITHUB_SHA: ${{ github.sha }}
 
+          # API-Football (elige UNO):
+          # Opción A (API-Sports directo):
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+
+          # Opción B (RapidAPI):
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          RAPIDAPI_HOST: ${{ secrets.RAPIDAPI_HOST }}
         run: python main.py
+
