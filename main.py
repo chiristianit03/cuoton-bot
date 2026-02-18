@@ -34,7 +34,7 @@ LEGS_RANGE_900 = (4, 6)
 LEGS_RANGE_300 = (4, 6)
 
 # Tolerancia de cuota final
-ODDS_TOL_900 = 0.30   # ±30%
+ODDS_TOL_900 = 0.18   # ±30%
 ODDS_TOL_300 = 0.25
 
 # Beam search
@@ -45,8 +45,8 @@ ODDS_MIN_GENERAL = 1.50
 ODDS_MAX_GENERAL = 15.0
 
 # “Estilo borroso” (patas altas para el 900)
-ODDS_MIN_BORROSO = 4.0
-ODDS_MAX_BORROSO = 9.0
+ODDS_MIN_BORROSO = 3.2
+ODDS_MAX_BORROSO = 6.5
 
 # Cuántos eventos enriquecemos con /events/{eventId}/odds para no gastar créditos
 MAX_EVENTS_ENRICH = 12
@@ -246,6 +246,11 @@ def extract_picks_from_event_odds(event_data: dict, sport_key: str) -> List[Pick
         else:
             label = f"{home} vs {away} | {mk}: {name} ({point}) @ {best_odds:.2f}"
 
+        # mínimo de probabilidad por pata (evita picks demasiado suicidas) 
+        if p_est < 0.18:
+            continue
+
+
         picks.append(
             Pick(
                 match_id=ev_id,
@@ -321,7 +326,7 @@ def build_acca_closest(
             new_states.append((acc2, log2, sc2, used2))
 
         # keep best states combining: score - closeness penalty
-        new_states.sort(key=lambda x: (x[2] - 0.55 * abs(x[1] - logT)), reverse=True)
+        new_states.sort(key=lambda x: (x[2] - 1.25 * abs(x[1] - logT)), reverse=True)
         states = new_states[:BEAM_WIDTH]
 
     # 1) best within tolerance window
