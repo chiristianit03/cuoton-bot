@@ -2,7 +2,8 @@ name: cuoton-bot
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # cada 30 minutos
+    - cron: "0 */12 * * *"
+
   workflow_dispatch:
 
 jobs:
