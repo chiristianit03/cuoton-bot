@@ -16,7 +16,7 @@ SPORT_KEYS = [
 ]
 
 REGION = "uk"              # en soccer suele venir mejor que eu
-MARKETS = "h2h"            # lo seguro en v4 para fútbol
+MARKETS = "h2h,spreads,totals"            # lo seguro en v4 para fútbol
 ODDS_PER_LEG_RANGE = (2.0, 12.0)   # baja el mínimo para que encuentre picks
 
 
@@ -55,11 +55,14 @@ def fetch_odds(sport_key: str) -> list:
         "oddsFormat": ODDS_FORMAT,
     }
     r = requests.get(url, params=params, timeout=25)
-    r.raise_for_status()
+
+    if r.status_code != 200:
+        # te manda el error exacto a Telegram (una vez lo veas, lo solucionamos al toque)
+        tg_send(f"ERROR API {sport_key}: HTTP {r.status_code}\n{r.text[:350]}")
+        return []
+
     return r.json()
-    print(sk, "events:", len(data))
-    if data:
-    print("example bookmakers:", len(data[0].get("bookmakers", [])))
+
 
 def extract_candidates(data: list, sport_key: str) -> List[Pick]:
     picks: List[Pick] = []
@@ -148,9 +151,7 @@ def main():
         try:
             data = fetch_odds(sk)
             all_picks.extend(extract_candidates(data, sk))
-        except Exception:
-            continue
-
+        
     if not all_picks:
         tg_send("No encontré candidatos hoy (o la API no devolvió datos).")
         return
