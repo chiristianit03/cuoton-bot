@@ -5,6 +5,7 @@ from typing import List, Tuple
 ODDS_API_KEY = os.environ["ODDS_API_KEY"]
 TG_BOT_TOKEN = os.environ["TG_BOT_TOKEN"]
 TG_CHAT_ID = os.environ["TG_CHAT_ID"]
+GITHUB_SHA = os.environ.get("GITHUB_SHA", "")[:7]
 
 # Ligas iniciales (puedes ampliar)
 SPORT_KEYS = [
