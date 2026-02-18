@@ -15,9 +15,10 @@ SPORT_KEYS = [
     "soccer_france_ligue_one",
 ]
 
-MARKETS = "totals,spreads,btts"  # MVP (luego sumamos corners/cards si el feed lo trae)
-REGION = "eu"
-ODDS_FORMAT = "decimal"
+REGION = "uk"              # en soccer suele venir mejor que eu
+MARKETS = "h2h"            # lo seguro en v4 para fútbol
+ODDS_PER_LEG_RANGE = (2.0, 12.0)   # baja el mínimo para que encuentre picks
+
 
 TARGET_ODDS = 900.0
 LEGS_RANGE = (4, 6)
