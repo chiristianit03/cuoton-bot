@@ -2,7 +2,7 @@ name: batibot-v4
 
 on:
   schedule:
-    - cron: "0 */12 * * *"   # cada 12 horas (free tier friendly)
+    - cron: "0 */23 * * *"   # cada 12 horas (free tier friendly)
   workflow_dispatch:
 
 jobs:
