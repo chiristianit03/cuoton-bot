@@ -68,7 +68,7 @@ CUOTON_ODDS_MAX = 7.5
 MIN_P_LEG_CUOTON = 0.21
 
 # Eventos enriquecidos (OJO créditos)
-MAX_EVENTS_ENRICH = 10
+MAX_EVENTS_ENRICH = 6
 EVENT_ODDS_SLEEP_SEC = 0.18
 
 # Mezcla modelo vs mercado
